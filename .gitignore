@@ -28,8 +28,8 @@
 
 # Text project files #
 ######################
-.sublime-project
-.sublime-workspace
+*.sublime-project
+*.sublime-workspace
 
 # OS generated files #
 ######################
