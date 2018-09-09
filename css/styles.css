@@ -6,11 +6,9 @@ body
 }
 
 
-.entries
-{
-	text-align: center;
-}
-
+/********************
+*****Layout Grid*****
+*********************/
 .lists
 {
 	display: grid;
@@ -21,6 +19,14 @@ body
 	grid-template-areas: ". . . ." ". . . ." ". . . .";
 }
 
+/*********************
+******ToDo Input******
+*********************/
+.entries
+{
+	text-align: center;
+}
+
 .toDoCreationForm
 {
 	text-align: center;
@@ -28,7 +34,29 @@ body
 	grid-row-start: 1;	
 }
 
+.button {
+    background-color: #b2b2b2;
+    border: none;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px
+}
 
+.input[type=text] {
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+/********************
+********Lists********
+********************/
 #toDoDiv
 {
 	text-align: center;
@@ -43,8 +71,13 @@ body
 	grid-row-start: 1;	
 }
 
+
+/*********************
+*List border elements*
+*********************/
 #centerLineVertical
 {
+	border-style: double;
 	grid-column-start: 2;
 	grid-column-end: 4;
 	grid-row-start: 1;
@@ -53,6 +86,7 @@ body
 
 #seperateLineHorizontal
 {
+	border-style: double;
 	width:100%;
 	margin-block-start: -1em;
 	grid-column-start: 2;
@@ -63,6 +97,7 @@ body
 
 #listBox
 {
+	border-style: double;
 	width:100%;
 	grid-column-start: 2;
 	grid-column-end: 4;
