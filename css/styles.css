@@ -1,7 +1,71 @@
 @charset "UTF-8";
-/**
- * 
- * @authors ${author} (${email})
- * @date    2018-09-06
- * @version $Id$
- */
+
+body
+{	
+
+}
+
+
+.entries
+{
+	text-align: center;
+}
+
+.lists
+{
+	display: grid;
+	height: 100%;
+	grid-template-columns: 0.5fr 1fr 1fr 0.5fr;
+	grid-template-rows: 0.75fr 1.5fr 0.5fr;
+	grid-gap: 1px 1px;
+	grid-template-areas: ". . . ." ". . . ." ". . . .";
+}
+
+.toDoCreationForm
+{
+	text-align: center;
+	grid-column-start: 2;
+	grid-row-start: 1;	
+}
+
+
+#toDoDiv
+{
+	text-align: center;
+	grid-column-start: 2;
+	grid-row-start: 1;
+}
+
+#doneDiv
+{
+	text-align: center;
+	grid-column-start: 3;
+	grid-row-start: 1;	
+}
+
+#centerLineVertical
+{
+	grid-column-start: 2;
+	grid-column-end: 4;
+	grid-row-start: 1;
+	grid-row-end: 4;
+}
+
+#seperateLineHorizontal
+{
+	width:100%;
+	margin-block-start: -1em;
+	grid-column-start: 2;
+	grid-column-end: 4;
+	grid-row-start: 2;
+	grid-row-end: 4;
+}
+
+#listBox
+{
+	width:100%;
+	grid-column-start: 2;
+	grid-column-end: 4;
+	grid-row-start: 1;
+	grid-row-end: 4;
+}

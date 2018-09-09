@@ -9,16 +9,25 @@
 	<title>ToDo App</title>
 </head>
 <body>
-
-<h1 id="toDoHeader" class="toDo">To Do</h1>
-<ul class="toDoList"></ul>
-<h1 id="doneHeader" class="done">Done</h1>
-<ul class="doneList"></ul>
-
-<input type="text" id="toDoInput" placeholder="Enter a To Do Item:">
-<input type="submit" class="button" id="submit" value="Submit">
-
-
+	<div class="entries">
+		<form action="index.html" id="toDoCreationForm">
+			<input type="text" id="toDoInput" value="" placeholder="Enter a To Do Item:">
+			<input type="submit" class="button" id="submit" value="Submit">
+		</form>
+	</div>
+	<div class="lists">
+		<hr id="listBox">
+		<div id="toDoDiv">
+			<h1 id="toDoHeader" class="toDo">To Do</h1>
+			<ul class="toDoList"></ul>
+		</div>
+		<hr id="centerLineVertical">
+		<div id="doneDiv">
+			<h1 id="doneHeader" class="done">Done</h1>
+			<ul class="doneList"></ul>
+		</div>
+		<hr id="seperateLineHorizontal">
+	</div>
 <script src="js/scripts.js"></script>
 </body>
 </html>
