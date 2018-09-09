@@ -27,6 +27,12 @@ body
 	text-align: center;
 }
 
+.entiresContent
+{
+    display: inline-block; 
+    text-align: left;
+}
+
 .toDoCreationForm
 {
 	text-align: center;
@@ -51,7 +57,16 @@ body
     padding: 12px 20px;
     font-size: 18px;
     font-weight: bold;
+    border-radius: 12px;
+    border-style: groove;
 }
+
+.inputLabel
+{
+	font-size: 18px;
+    font-weight: bold;
+}
+
 
 
 /********************
