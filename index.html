@@ -9,8 +9,9 @@
 	<title>ToDo App</title>
 </head>
 <body>
+	<!-- To Do Item input form -->
 	<div class="entries">
-		<form action="index.html" id="toDoCreationForm">
+		<form method="post" id="toDoCreationForm" name="toDoCreationForm" action="index.html">
 			<div class="entiresContent">
 				<label class="inputLabel">Enter a To Do Item:</label>
 				<br>
@@ -19,18 +20,24 @@
 			</div>
 		</form>
 	</div>
+	<!-- To Do/Done Lists  -->
 	<div class="lists">
-		<hr id="listBox">
-		<div id="toDoDiv">
-			<h1 id="toDoHeader" class="toDo">To Do</h1>
-			<ul class="toDoList"></ul>
-		</div>
-		<hr id="centerLineVertical">
-		<div id="doneDiv">
-			<h1 id="doneHeader" class="done">Done</h1>
-			<ul class="doneList"></ul>
-		</div>
-		<hr id="seperateLineHorizontal">
+		<h1 id="toDoHeader" class="toDoH1">To Do</h1>
+		<ul id="toDoUL" class="toDoList"></ul>
+
+		<h1 id="doneHeader" class="doneH1">Done</h1>
+		<ul id="doneUL" class="doneList"></ul>
+	</div>
+
+
+	<!-- To Do/Done Item Modal -->
+	<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modalContent">
+		<span class="close">&times;</span>
+	</div>
+
 	</div>
 <script src="js/scripts.js"></script>
 </body>

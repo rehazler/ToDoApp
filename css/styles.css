@@ -14,10 +14,11 @@ body
 	display: grid;
 	height: 100%;
 	grid-template-columns: 0.5fr 1fr 1fr 0.5fr;
-	grid-template-rows: 0.75fr 1.5fr 0.5fr;
-	grid-gap: 1px 1px;
+	grid-template-rows: 0fr 1.5fr 0.5fr;
+	/* grid-gap: 1px 1px; */
 	grid-template-areas: ". . . ." ". . . ." ". . . .";
 }
+
 
 /*********************
 ******ToDo Input******
@@ -70,52 +71,102 @@ body
 
 
 /********************
-********Lists********
+****List Elements****
 ********************/
-#toDoDiv
+.toDoH1
 {
+	border: thick double black;
+	border-top-left-radius: 25px;
+	margin: inherit;
 	text-align: center;
 	grid-column-start: 2;
 	grid-row-start: 1;
+	background: #3399ff;
 }
 
-#doneDiv
+.toDoList
 {
+	border: thick double black;
+	margin: inherit;
+	text-align: center;
+	grid-column-start: 2;
+	grid-row-start: 2;
+	background: #3399ff;
+}
+
+.toDoListItem
+{
+	text-align: left;
+	background: #cce5ff;
+    margin: 5px 5px 5px -20px;
+}
+
+.doneH1
+{
+	border: thick double black;
+	border-top-right-radius: 25px;
+	margin-top: inherit;
+	margin-bottom: inherit;
 	text-align: center;
 	grid-column-start: 3;
-	grid-row-start: 1;	
-}
-
-
-/*********************
-*List border elements*
-*********************/
-#centerLineVertical
-{
-	border-style: double;
-	grid-column-start: 2;
-	grid-column-end: 4;
 	grid-row-start: 1;
-	grid-row-end: 4;
+	background: #3399ff;	
 }
 
-#seperateLineHorizontal
+.doneList
 {
-	border-style: double;
-	width:100%;
-	margin-block-start: -1em;
-	grid-column-start: 2;
-	grid-column-end: 4;
+	border: thick double black;
+	margin: inherit;
+	text-align: center;
+	grid-column-start: 3;
 	grid-row-start: 2;
-	grid-row-end: 4;
+	background: #3399ff;	
 }
 
-#listBox
+.doneListItem
 {
-	border-style: double;
-	width:100%;
-	grid-column-start: 2;
-	grid-column-end: 4;
-	grid-row-start: 1;
-	grid-row-end: 4;
+	text-align: left;
+	background: #cce5ff;
+    margin: 5px;
+}
+
+
+
+/*******************
+******The Modal*****
+*******************/
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modalContent {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
 }
