@@ -42,11 +42,11 @@
 //Constructors//
 ////////////////
 
-//toDoID, toDoTitle, toDoDiscription, toDoPriority, dueDate, toDoStatus
-function Task(toDoTitle, toDoDiscription = "", toDoPriority = 0, dueDate = new Date(), toDoStatus = "In Progress")
+//toDoID, toDoTitle, toDoDescrption, toDoPriority, dueDate, toDoStatus
+function Task(toDoTitle, toDoDescrption = "", toDoPriority = 0, dueDate = new Date(), toDoStatus = "In Progress")
 {
 	this.to_do_title = toDoTitle; 
-	this.to_do_discription = toDoDiscription; 
+	this.to_do_descrption = toDoDescrption; 
 	this.to_do_priority = toDoPriority;
 	this.due_date = dueDate;
 	this.to_do_status = toDoStatus;
@@ -119,19 +119,30 @@ function initializePage()
 	// When user clicks a list item, pop up a modal for that list item
 	toDolist.addEventListener("click", event => 
 	{
+		// If the user clicks an li
 		if(event.target && event.target.nodeName == "LI") {
 			let deleteButton = createHTMLElement("button", "Delete", ["delete_button"]);
-			modalText.appendChild(createHTMLElement("p", `${event.target.id} was clicked. \n${event.target.textContent}`));
+			let taskID = event.target.id;
+			modalText.appendChild(createHTMLElement("p", `${taskID} was clicked. \n${event.target.textContent}`));
 			modalText.appendChild(deleteButton);
 			modal.style.display = "block";
 
-			//Needs rework for modal task deletion based on value not key
-			// deleteButton.addEventListener("click", function () {
-			// 	console.log("tried deleting");
-			// 	// removeTask();
-			// 	console.log(event.target.id - 1);
-			// 	localStorage.removeItem("tasks");
-			// });
+			//Delete task button
+			//Removes the task from the list, form memory, and removes the event listener that is created when the modal is opened
+			deleteButton.addEventListener("click", function removeTask(){
+				if(confirm(`The event "${event.target.textContent}" will be gone forever. Is this ok?`))
+				{
+					let targetedListItem = document.querySelector(`#${taskID}`);
+					let taskArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+
+					toDolist.removeChild(targetedListItem);
+					taskArray.splice(taskID, 1);
+					localStorage.setItem("tasks", JSON.stringify(taskArray));
+					deleteButton.removeEventListener("click", removeTask);
+					modalText.textContent = "";
+					modal.style.display = "none";
+				}
+			});
 		}
 	});
 
@@ -188,7 +199,7 @@ function liCreator(classArray, itemText)
 		newToDoItem.classList.add(classArray[i]);
 	}
 
-	newToDoItem.setAttribute("id", toDolist.childElementCount + 1);
+	newToDoItem.setAttribute("id", `task${toDolist.childElementCount + 1}`);
 
 	toDolist.appendChild(newToDoItem);
 }
@@ -201,18 +212,11 @@ function storeTasks(taskObject)
 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
 }
 
-//Needs to be reworked to remove item removal repeatition.
-// function removeTask() {
-// 	let taskArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-// 	console.log(taskArray);
-//	//REMOVE item !!!
-
-//	localStorage.setItem(x, JSON.stringify(ds));
-// }
 
 //Needs to be reworked to fill in modal information and inputs
 // function populateModal()
 // {
+
 // }
 
 
