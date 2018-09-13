@@ -7,44 +7,14 @@
 
 
 
-
-// const form = document.querySelector("form");
-// const ul = document.querySelector("ul");
-// const button = document.querySelector("button");
-// const input = document.getElementById("item");
-
-
-
-// form.addEventListener("submit", function (e) {
-// 	e.preventDefault();
-
-// 	tasksArray.push(input.value);
-// 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
-// 	liCreator(["toDoListItem"],input.value);
-// 	input.value = "";
-// });
-
-// data.forEach(item => {
-// 	liCreator(item);
-// });
-
-// button.addEventListener("click", function () {
-// 	localStorage.clear();
-// 	while (ul.firstChild) {
-// 		ul.removeChild(ul.firstChild);
-// 	}
-// });
-
-
-
-
 ////////////////
 //Constructors//
 ////////////////
 
 //toDoID, toDoTitle, toDoDescrption, toDoPriority, dueDate, toDoStatus
-function Task(toDoTitle, toDoDescrption = "", toDoPriority = 0, dueDate = new Date(), toDoStatus = "In Progress")
+function Task(toDoID, toDoTitle, toDoDescrption = "", toDoPriority = 0, dueDate = new Date(), toDoStatus = "In Progress")
 {
+	this.to_do_id = toDoID;
 	this.to_do_title = toDoTitle; 
 	this.to_do_descrption = toDoDescrption; 
 	this.to_do_priority = toDoPriority;
@@ -60,23 +30,24 @@ function Task(toDoTitle, toDoDescrption = "", toDoPriority = 0, dueDate = new Da
 //Initalize storage, existing stored items if they exist, and adds event listeners on page load.
 function initializePage()
 {
-
 	//////////////////
 	//Client Storage//
 	//////////////////
 
 	//If local storage has items in it get them and parse them as json else store empty array.
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+	let totalTasksCount = localStorage.getItem("totalTasks") ? JSON.parse(localStorage.getItem("totalTasks")) : 0;
 
 	//Set localstorage to currently stored info
 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
+	localStorage.setItem("totalTasks", totalTasksCount);
 
 	//Parse each item from local storage
 	const data = JSON.parse(localStorage.getItem("tasks"));
 
 	// Loop through each stored item in the localstorage and recreate it on refresh/reload
 	data.forEach(task => {
-		liCreator(["toDoListItem"], task["to_do_title"]);
+		liCreator(["toDoListItem"], task["to_do_title"], task["to_do_id"]);
 	});
 
 	////////////////
@@ -88,7 +59,7 @@ function initializePage()
 	// Get the modal
 	let modal = document.querySelector("#myModal");
 	//Modal content
-	let modalText = document.querySelector(".modalText");
+	let modalText = document.querySelectorAll(".modalText")[0];
 	// Get the <span> element that closes the modal
 	let spanClose = document.querySelectorAll(".close")[0];
 
@@ -104,9 +75,10 @@ function initializePage()
 
 		if(event.target.toDoInput.value.trim())
 		{
-			const task = new Task(event.target.toDoInput.value);
+			localStorage.setItem("totalTasks",  ++totalTasksCount );
+			const task = new Task(`task${totalTasksCount}`, event.target.toDoInput.value);
 			storeTasks(task);
-			liCreator(["toDoListItem"], event.target.toDoInput.value);
+			liCreator(["toDoListItem"], event.target.toDoInput.value, task["to_do_id"]);
 		}
 		else
 		{
@@ -134,10 +106,8 @@ function initializePage()
 				{
 					let targetedListItem = document.querySelector(`#${taskID}`);
 					let taskArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-
 					toDolist.removeChild(targetedListItem);
-					taskArray.splice(taskID, 1);
-					localStorage.setItem("tasks", JSON.stringify(taskArray));
+					removeTaskFromMemory(taskArray, taskID);
 					deleteButton.removeEventListener("click", removeTask);
 					modalText.textContent = "";
 					modal.style.display = "none";
@@ -186,9 +156,10 @@ function createHTMLElement(elementType, text="", classArray=[])
 	return newElement;
 }
 
+
 //Creates a li element for the list and appends it. Does not return the element. 
 //If return is necessary create an li using the createHTMLElement function.
-function liCreator(classArray, itemText) 
+function liCreator(classArray, itemText, itemID) 
 {
 	let toDolist = document.querySelector("#toDoUL");
 
@@ -199,7 +170,8 @@ function liCreator(classArray, itemText)
 		newToDoItem.classList.add(classArray[i]);
 	}
 
-	newToDoItem.setAttribute("id", `task${toDolist.childElementCount + 1}`);
+	newToDoItem.setAttribute("id", itemID);
+
 
 	toDolist.appendChild(newToDoItem);
 }
@@ -210,6 +182,15 @@ function storeTasks(taskObject)
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
 	tasksArray.push(taskObject);
 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
+}
+
+function removeTaskFromMemory(taskArray, taskID)
+{
+	taskArray = taskArray.filter(function( task ) {
+		return task.to_do_id !== taskID;
+	});
+
+	localStorage.setItem("tasks", JSON.stringify(taskArray));
 }
 
 
