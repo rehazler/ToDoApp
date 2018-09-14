@@ -28,13 +28,13 @@ body
 	text-align: center;
 }
 
-.entiresContent
+.entires-content
 {
-    display: inline-block; 
-    text-align: left;
+	display: inline-block; 
+	text-align: left;
 }
 
-.toDoCreationForm
+.to-do-creation-form
 {
 	text-align: center;
 	grid-column-start: 2;
@@ -42,44 +42,107 @@ body
 }
 
 .button {
-    background-color: #b2b2b2;
-    border: none;
-    padding: 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 12px
+	background-color: #b2b2b2;
+	border: none;
+	padding: 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	border-radius: 12px
 }
 
-.delete_button
+.delete-button
 {
 	background-color: #FF0000;
-    border: none;
-    padding: 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 12px
+	border: none;
+	padding: 10px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	border-radius: 12px
 }
 
 .input[type=text] {
-    padding: 12px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 12px;
-    border-style: groove;
+	padding: 12px 20px;
+	font-size: 18px;
+	font-weight: bold;
+	border-radius: 12px;
+	border-style: groove;
 }
 
-.inputLabel
+.input-label
 {
 	font-size: 18px;
-    font-weight: bold;
+	font-weight: bold;
+}
+
+.checkbox-container 
+{
+	display: block;
+	position: relative;
+	padding-right: 5px;
+	margin: 0px 0px 0px -33px;
+	cursor: pointer;
+	font-size: 22px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.checkbox-container input {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.checkmark {
+	position: absolute;
+	top: 2px;
+	left: 0;
+	height: 20px;
+	width: 20px;
+	background-color: #eee;
+}
+
+.checkbox-container:hover input ~ .checkmark 
+{
+	background-color: #ccc;
+}
+
+.checkbox-container input:checked ~ .checkmark 
+{
+	background-color: red;
+}
+
+.checkmark:after {
+	content: "";
+	position: absolute;
+	display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after 
+{
+	display: block;
+}
+
+.checkbox-container .checkmark:after 
+{
+	left: 5px;
+	top: 1px;
+	width: 5px;
+	height: 10px;
+	border: solid white;
+	border-width: 0 3px 3px 0;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
 }
 
 
@@ -87,7 +150,7 @@ body
 /********************
 ****List Elements****
 ********************/
-.toDoH1
+.to-do-h1
 {
 	border: thick double black;
 	border-top-left-radius: 25px;
@@ -98,7 +161,7 @@ body
 	background: #3399ff;
 }
 
-.toDoList
+.to-do-list
 {
 	border: thick double black;
 	margin: inherit;
@@ -106,16 +169,23 @@ body
 	grid-column-start: 2;
 	grid-row-start: 2;
 	background: #3399ff;
+	list-style:none;
 }
 
-.toDoListItem
+.to-do-list-item
 {
+	font-size: 25px;
 	text-align: left;
 	background: #cce5ff;
-    margin: 5px 5px 5px -20px;
+	margin: 5px 5px 5px 25px;
 }
 
-.doneH1
+.completed-task
+{
+	text-decoration: line-through;
+}
+
+.done-h1
 {
 	border: thick double black;
 	border-top-right-radius: 25px;
@@ -127,7 +197,7 @@ body
 	background: #3399ff;	
 }
 
-.doneList
+.done-list
 {
 	border: thick double black;
 	margin: inherit;
@@ -137,11 +207,11 @@ body
 	background: #3399ff;	
 }
 
-.doneListItem
+.done-list-item
 {
 	text-align: left;
 	background: #cce5ff;
-    margin: 5px;
+	margin: 5px;
 }
 
 
@@ -150,37 +220,37 @@ body
 ******The Modal*****
 *******************/
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    padding-top: 100px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+	display: none;
+	position: fixed;
+	z-index: 1;
+	padding-top: 100px;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgb(0,0,0);
+	background-color: rgba(0,0,0,0.4);
 }
 
-.modalContent {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
+.modal-content {
+	background-color: #fefefe;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
 }
 
 .close {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+	color: #aaaaaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
 }
 
 .close:hover,
 .close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
 }

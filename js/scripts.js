@@ -47,19 +47,19 @@ function initializePage()
 
 	// Loop through each stored item in the localstorage and recreate it on refresh/reload
 	data.forEach(task => {
-		liCreator(["toDoListItem"], task["to_do_title"], task["to_do_id"]);
+		liCreator(["to-do-list-item"], task["to_do_title"], task["to_do_id"]);
 	});
 
 	////////////////
 	//DOM Elements//
 	////////////////
 
-	let toDolist = document.querySelector("#toDoUL");
+	let toDoList = document.querySelector("#toDoUL");
 	let toDoForm = document.forms.toDoCreationForm;
 	// Get the modal
 	let modal = document.querySelector("#myModal");
 	//Modal content
-	let modalText = document.querySelectorAll(".modalText")[0];
+	let modalText = document.querySelectorAll(".modal-text")[0];
 	// Get the <span> element that closes the modal
 	let spanClose = document.querySelectorAll(".close")[0];
 
@@ -67,6 +67,20 @@ function initializePage()
 	///////////////////
 	//Event Listeners//
 	///////////////////
+
+	toDoList.addEventListener("change", event => 
+	{
+		let checkedListItem = event.target.closest(".to-do-list-item");
+
+		if(event.target.checked){
+			checkedListItem.classList.add("completed-task");
+			setTimeout(moveTaskToDoneList, 2000, checkedListItem.id, event.target);
+		}
+		else
+		{
+			checkedListItem.classList.remove("completed-task");
+		}
+	});
 
 	// When user hit"s submit, add item in input to list.
 	toDoForm.addEventListener("submit", event =>
@@ -78,7 +92,7 @@ function initializePage()
 			localStorage.setItem("totalTasks",  ++totalTasksCount );
 			const task = new Task(`task${totalTasksCount}`, event.target.toDoInput.value);
 			storeTasks(task);
-			liCreator(["toDoListItem"], event.target.toDoInput.value, task["to_do_id"]);
+			liCreator(["to-do-list-item"], event.target.toDoInput.value, task["to_do_id"]);
 		}
 		else
 		{
@@ -89,11 +103,11 @@ function initializePage()
 	});
 
 	// When user clicks a list item, pop up a modal for that list item
-	toDolist.addEventListener("click", event => 
+	toDoList.addEventListener("click", event => 
 	{
 		// If the user clicks an li
 		if(event.target && event.target.nodeName == "LI") {
-			let deleteButton = createHTMLElement("button", "Delete", ["delete_button"]);
+			let deleteButton = createHTMLElement("button", "Delete", ["delete-button"]);
 			let taskID = event.target.id;
 			modalText.appendChild(createHTMLElement("p", `${taskID} was clicked. \n${event.target.textContent}`));
 			modalText.appendChild(deleteButton);
@@ -106,7 +120,7 @@ function initializePage()
 				{
 					let targetedListItem = document.querySelector(`#${taskID}`);
 					let taskArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-					toDolist.removeChild(targetedListItem);
+					toDoList.removeChild(targetedListItem);
 					removeTaskFromMemory(taskArray, taskID);
 					deleteButton.removeEventListener("click", removeTask);
 					modalText.textContent = "";
@@ -134,6 +148,16 @@ function initializePage()
 	});
 }
 
+function moveTaskToDoneList(taskID, targetElement)
+{
+	if(targetElement.checked)
+	{
+		let completedTask = targetElement.closest(".to-do-list-item");
+		liCreator(completedTask.classList, completedTask.textContent, completedTask.id, true);
+	}
+	
+}
+
 //Returns the number of tasks that exist in the localStorage
 function taskCounter()
 {
@@ -159,22 +183,47 @@ function createHTMLElement(elementType, text="", classArray=[])
 
 //Creates a li element for the list and appends it. Does not return the element. 
 //If return is necessary create an li using the createHTMLElement function.
-function liCreator(classArray, itemText, itemID) 
+function liCreator(classArray, itemText, itemID, done = false) 
 {
-	let toDolist = document.querySelector("#toDoUL");
-
+	let list;	
 	let newToDoItem = document.createElement("li");
+
 	newToDoItem.textContent = itemText;
 
 	for(let i = 0; i < classArray.length; i++) {
 		newToDoItem.classList.add(classArray[i]);
 	}
-
 	newToDoItem.setAttribute("id", itemID);
 
 
-	toDolist.appendChild(newToDoItem);
+	if(!done)
+	{
+		list = document.querySelector("#toDoUL");
+		list.appendChild(newToDoItem);
+		checkboxCreator(itemID);
+	}
+	else
+	{
+		list = document.querySelector("#doneUL");
+		list.appendChild(newToDoItem);
+	}
 }
+
+//Creates a checkbox for each list item
+function checkboxCreator(itemID) 
+{
+	let toDoItem = document.querySelector(`#${itemID}`);
+	let newCheckboxContainer = createHTMLElement("label","",["checkbox-container"]);
+	let newCheckbox = createHTMLElement("input","",["checkbox"]);
+	let newCheckboxCheckmark = createHTMLElement("span","",["checkmark"]);
+
+	newCheckbox.setAttribute("type", "checkbox");
+
+	toDoItem.insertBefore(newCheckboxContainer, toDoItem.firstChild);
+	newCheckboxContainer.appendChild(newCheckbox);
+	newCheckboxContainer.appendChild(newCheckboxCheckmark);
+}
+
 
 //Stores tasks in localStorage
 function storeTasks(taskObject) 
