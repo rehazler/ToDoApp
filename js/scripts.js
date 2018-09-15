@@ -111,7 +111,7 @@ function moveTaskToDoneList(taskID, targetElement)
 	if(targetElement.checked)
 	{
 		let completedTask = targetElement.closest(".to-do-list-item");
-		modifyTasks(taskID);
+		modifyTasks(getTaskIndex(taskID), "Complete");
 		completedTask.classList.remove("to-do-list-item");
 		completedTask.parentNode.removeChild(completedTask);
 		liCreator(completedTask.textContent, completedTask.id, "Done", completedTask.classList);
@@ -198,19 +198,34 @@ function storeTasks(taskObject)
 }
 
 //Stores tasks in localStorage
-function modifyTasks(taskID) 
+function modifyTasks(taskIndex, modificationType) 
 {
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-	let targetTask;
-	tasksArray = tasksArray.filter(function( task ) {
-		if(task.to_do_id === taskID)
-		{
-			task.to_do_status = "Complete";
-			targetTask = task;
-		}
 
-		return task;
-	});
+	switch (modificationType)
+	{
+	case "Complete":
+		console.log("marked complete");
+		tasksArray[taskIndex].to_do_status = "Complete";
+		break;
+
+	case "Title":
+		console.log("changed title");
+		break;
+
+	case "Description":
+		console.log("changed description");
+		break;
+
+	case "Priority":
+		console.log("changed priority");
+		break;
+
+	case "Due":
+		console.log("changed due date");
+		break;
+	}
+	
 
 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
 }
@@ -238,6 +253,18 @@ function modalToggle(modalText)
 	}
 }
 
+function getTaskIndex(taskID)
+{
+	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+	for(let index = 0; index < tasksArray.length; index++)
+	{
+		if(tasksArray[index].to_do_id === taskID)
+		{
+			return index;
+		}
+	}
+}
+
 //Needs to be reworked to fill in modal information and inputs
 function populateModal(event)
 {
@@ -249,10 +276,13 @@ function populateModal(event)
 	let spanClose = document.querySelectorAll(".close")[0];
 	let list = event.target.closest("UL");
 
+	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+	let taskID = event.target.id;
+	let targetTaskIndex = getTaskIndex(taskID);
+
 	// If the user clicks an li
 	if(event.target && event.target.nodeName == "LI") {
 		let deleteButton = createHTMLElement("button", "Delete", ["delete-button"]);
-		let taskID = event.target.id;
 		modalText.appendChild(createHTMLElement("p", `${taskID} was clicked. \n${event.target.textContent}`));
 		modalText.appendChild(deleteButton);
 		modalToggle(modalText);
@@ -263,7 +293,6 @@ function populateModal(event)
 			if(confirm(`The event "${event.target.textContent}" will be gone forever. Is this ok?`))
 			{
 				let targetedListItem = document.querySelector(`#${taskID}`);
-				let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
 				list.removeChild(targetedListItem);
 				removeTaskFromMemory(tasksArray, taskID);
 				deleteButton.removeEventListener("click", removeTask);
