@@ -11,14 +11,14 @@
 //Constructors//
 ////////////////
 
-//toDoID, toDoTitle, toDoDescrption, toDoPriority, dueDate, toDoStatus
-function Task(toDoID, toDoTitle, toDoDescrption = "", toDoPriority = 0, dueDate = new Date(), toDoStatus = "In Progress")
+//toDoID, toDoTitle, toDoDescription, toDoPriority, dueDate, toDoStatus
+function Task(toDoID, toDoTitle, toDoDescription = "", toDoPriority = 1, toDoDueDate = new Date(), toDoStatus = "In Progress")
 {
 	this.to_do_id = toDoID;
 	this.to_do_title = toDoTitle; 
-	this.to_do_descrption = toDoDescrption; 
+	this.to_do_description = toDoDescription; 
 	this.to_do_priority = toDoPriority;
-	this.due_date = dueDate;
+	this.to_do_due_date = toDoDueDate;
 	this.to_do_status = toDoStatus;
 }
 
@@ -70,7 +70,6 @@ function initializePage()
 
 		if(event.target.checked){
 			timer.push({checkedListItemID:setTimeout(moveTaskToDoneList, 2000, checkedListItemID, event.target)});
-			console.log(timer);
 		}
 		else
 		{
@@ -130,10 +129,22 @@ function taskCounter()
 function createHTMLElement(elementType, text="", classArray=[]) 
 {
 	let newElement = document.createElement(elementType);
-	if(text != "")
+
+	//If element type is a form then the text argument will be used to create the ID
+	//rather than setting it to the elements textContent;
+	if(elementType === "form")
+	{
+		newElement.setAttribute("method", "post");
+		newElement.setAttribute("id", `${text}Form`);
+		newElement.setAttribute("action", "index.html");
+	}
+	//If element isn't a form and the text is set, the text content of the element
+	//will be set to the text argument
+	else if(text !== "")
 	{
 		newElement.textContent = text;
 	}
+	
 
 	for(let i = 0; i < classArray.length; i++) {
 		newElement.classList.add(classArray[i]);
@@ -148,8 +159,10 @@ function liCreator(itemText, itemID, toDoStatus, classArray=[])
 {
 	let list;	
 	let newToDoItem = document.createElement("li");
+	let span = document.createElement("span");
 
-	newToDoItem.textContent = itemText;
+	span.textContent = itemText;
+	newToDoItem.appendChild(span);
 
 	for(let i = 0; i < classArray.length; i++) {
 		newToDoItem.classList.add(classArray[i]);
@@ -171,6 +184,18 @@ function liCreator(itemText, itemID, toDoStatus, classArray=[])
 		list = document.querySelector("#doneUL");
 		list.appendChild(newToDoItem);
 	}
+}
+
+function labelCreator(text, classArray=[]) 
+{
+	let newLabel = document.createElement("label");
+	
+	text = text.split("_").map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(" ");
+	newLabel.textContent = text;
+	for(let i = 0; i < classArray.length; i++) {
+		newLabel.classList.add(classArray[i]);
+	}
+	return newLabel;
 }
 
 //Creates a checkbox for each list item
@@ -198,31 +223,26 @@ function storeTasks(taskObject)
 }
 
 //Stores tasks in localStorage
-function modifyTasks(taskIndex, modificationType) 
+function modifyTasks(taskIndex, modificationType, form = "") 
 {
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+	let taskElement;
 
 	switch (modificationType)
 	{
 	case "Complete":
-		console.log("marked complete");
 		tasksArray[taskIndex].to_do_status = "Complete";
 		break;
 
-	case "Title":
-		console.log("changed title");
-		break;
+	case "Edit":
+		taskElement = document.querySelector(`#${tasksArray[taskIndex].to_do_id}`);
+		//Change the title in the list item's span
+		taskElement.childNodes[1].textContent = form.titleInput.value;
+		tasksArray[taskIndex].to_do_title = form.titleInput.value;
+		tasksArray[taskIndex].to_do_description = form.descriptionInput.value;
+		tasksArray[taskIndex].to_do_priority = form.priorityInput.value;
+		tasksArray[taskIndex].to_do_due_date = new Date(`${form.dueDateInput.value} ${form.dueTimeInput.value}`);
 
-	case "Description":
-		console.log("changed description");
-		break;
-
-	case "Priority":
-		console.log("changed priority");
-		break;
-
-	case "Due":
-		console.log("changed due date");
 		break;
 	}
 	
@@ -239,9 +259,13 @@ function removeTaskFromMemory(tasksArray, taskID)
 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
 }
 
-function modalToggle(modalText)
+function modalToggle()
 {
 	let modal = document.querySelector("#myModal");
+	let modalContent = document.querySelector(".modal-content");
+	let modalText = document.querySelector(".modal-text");
+	let editForm = document.forms.editForm ? document.forms.editForm : "";
+
 	if(modal.classList.contains("hidden"))
 	{
 		modal.classList.remove("hidden");
@@ -250,6 +274,12 @@ function modalToggle(modalText)
 	{
 		modal.classList.add("hidden");
 		modalText.textContent = "";
+		modalContent.appendChild(modalText);
+		if(editForm !== "")
+		{
+			editForm.textContent = "";
+			modalContent.removeChild(editForm);
+		}
 	}
 }
 
@@ -265,6 +295,71 @@ function getTaskIndex(taskID)
 	}
 }
 
+function populateEditModal(taskID, taskElementArray)
+{
+	let taskIndex = getTaskIndex(taskID);
+	let taskToEdit = JSON.parse(localStorage.getItem("tasks"))[taskIndex];
+
+	let modal = document.querySelector(".modal-text");
+	let editForm = createHTMLElement("form", "edit");
+	let submitButton = createHTMLElement("input", "Submit", ["input", "edit-button"]);
+	let titleInput = createHTMLElement("input", "Title", ["input", "modal-input-spacing"]);
+	let descriptionInput = createHTMLElement("textarea", "Description", ["description-input", "modal-input-spacing"]);
+	let priorityInput  = createHTMLElement("input", "Priority", ["due-date-input", "modal-input-spacing"]);
+	let dueDateInput = createHTMLElement("input", "Due Date", ["due-date-input", "modal-input-spacing"]);
+	let dueTimeInput = createHTMLElement("input", "Due Time", ["due-time-input", "modal-input-spacing"]);
+
+	titleInput.setAttribute("type", "text");
+	titleInput.setAttribute("value", taskToEdit.to_do_title);
+	titleInput.setAttribute("id", "titleInput");
+	modal.insertBefore(titleInput, taskElementArray[0].nextSibling);
+	modal.insertBefore(document.createElement("br"), titleInput.nextSibling);
+
+	descriptionInput.setAttribute("value", taskToEdit.to_do_description);
+	descriptionInput.setAttribute("id", "descriptionInput");
+	modal.insertBefore(descriptionInput, taskElementArray[1].nextSibling);
+	modal.insertBefore(document.createElement("br"), descriptionInput.nextSibling);
+
+	priorityInput.setAttribute("type", "number");
+	priorityInput.setAttribute("value", taskToEdit.to_do_priority);
+	priorityInput.setAttribute("min", 1);
+	priorityInput.setAttribute("max", 5);
+	priorityInput.setAttribute("id", "priorityInput");
+	modal.insertBefore(priorityInput, taskElementArray[2].nextSibling);
+	modal.insertBefore(document.createElement("br"), priorityInput.nextSibling);
+
+	dueDateInput.setAttribute("type", "date");
+	dueDateInput.setAttribute("id", "dueDateInput");
+	modal.insertBefore(dueDateInput, taskElementArray[3].nextSibling);
+
+	dueTimeInput.setAttribute("type", "time");
+	dueTimeInput.setAttribute("id", "dueTimeInput");
+	modal.insertBefore(dueTimeInput, dueDateInput.nextSibling);
+	modal.insertBefore(document.createElement("br"), dueTimeInput.nextSibling);
+
+	modal.parentNode.insertBefore(editForm, modal);
+	editForm.appendChild(modal);
+
+	submitButton.setAttribute("type", "submit");
+	submitButton.setAttribute("value", "Submit");
+	submitButton.setAttribute("id", "editSubmit");
+	editForm.appendChild(submitButton);
+
+	editForm.addEventListener("submit", function editTask()
+	{
+		event.preventDefault();
+		
+		if(confirm("Do you want to submit these task changes?"))
+		{
+			modifyTasks(taskIndex, "Edit", event.target);
+			modalToggle();
+			editForm.addEventListener("submit",editTask);
+		}
+	});
+}
+
+
+
 //Needs to be reworked to fill in modal information and inputs
 function populateModal(event)
 {
@@ -278,40 +373,64 @@ function populateModal(event)
 
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
 	let taskID = event.target.id;
-	let targetTaskIndex = getTaskIndex(taskID);
+	let targetTask = tasksArray[getTaskIndex(taskID)];
 
 	// If the user clicks an li
 	if(event.target && event.target.nodeName == "LI") {
 		let deleteButton = createHTMLElement("button", "Delete", ["delete-button"]);
-		modalText.appendChild(createHTMLElement("p", `${taskID} was clicked. \n${event.target.textContent}`));
+		let editButton = createHTMLElement("button", "Edit", ["edit-button"]);
+		
+		let targetTaskArray = new Array();
+		for(let key in targetTask)
+		{
+			if(key !== "to_do_id")
+			{
+				let newElement = createHTMLElement("p", targetTask[key], ["modal-task-attributes"]);
+				modalText.appendChild(newElement);
+				targetTaskArray.push(newElement);
+				modalText.insertBefore(labelCreator(key, ["modal-task-label"]), newElement);
+			}
+		}
+		
+		modalToggle();
+
+		modalText.appendChild(editButton);
 		modalText.appendChild(deleteButton);
-		modalToggle(modalText);
 
 		//Delete task button
 		//Removes the task from the list, form memory, and removes the event listener that is created when the modal is opened
-		deleteButton.addEventListener("click", function removeTask(){
+		deleteButton.addEventListener("click", function removeTask()
+		{
 			if(confirm(`The event "${event.target.textContent}" will be gone forever. Is this ok?`))
 			{
 				let targetedListItem = document.querySelector(`#${taskID}`);
 				list.removeChild(targetedListItem);
 				removeTaskFromMemory(tasksArray, taskID);
 				deleteButton.removeEventListener("click", removeTask);
-				modalToggle(modalText);
+				modalToggle();
 			}
+		});
+
+		editButton.addEventListener("click", function editTask()
+		{
+			modalText.removeChild(editButton);
+			modalText.removeChild(deleteButton);
+			populateEditModal(taskID, targetTaskArray);
+			editButton.removeEventListener("click", editTask);
+			
 		});
 
 		// When the user clicks on <span> (x), close the modal
 		spanClose.addEventListener("click", function closeSpanModal()
 		{ 
-			modalText.textContent = "";
-			modalToggle(modalText);
+			modalToggle();
 			spanClose.removeEventListener("click", closeSpanModal);
 		});
 		// When the user clicks anywhere outside of the modal, close it
 		window.addEventListener("click", function closeWindowModal(event) 
 		{
 			if (event.target == modal) {
-				modalToggle(modalText);
+				modalToggle();
 				window.removeEventListener("click", closeWindowModal);
 			}
 		});

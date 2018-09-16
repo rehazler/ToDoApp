@@ -68,7 +68,57 @@ body
 	border-radius: 12px
 }
 
+.edit-button
+{
+	background-color: #32CD32;
+	border: none;
+	padding: 10px 19.34375px 10px 19.34374px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+	border-radius: 12px
+}
+
 .input[type=text] {
+	padding: 12px 20px;
+	font-size: 18px;
+	font-weight: bold;
+	border-radius: 12px;
+	border-style: groove;
+}
+
+.description-input
+{
+	padding: 12px 20px;
+	font-size: 18px;
+	font-weight: bold;
+	border-radius: 12px;
+	border-style: groove;
+}
+
+.priority-input
+{
+	padding: 12px 20px;
+	font-size: 18px;
+	font-weight: bold;
+	border-radius: 12px;
+	border-style: groove;
+}
+
+.due-date-input
+{
+	padding: 12px 20px;
+	font-size: 18px;
+	font-weight: bold;
+	border-radius: 12px;
+	border-style: groove;
+}
+
+.due-time-input
+{
 	padding: 12px 20px;
 	font-size: 18px;
 	font-weight: bold;
@@ -81,6 +131,7 @@ body
 	font-size: 18px;
 	font-weight: bold;
 }
+
 
 .checkbox-container 
 {
@@ -242,6 +293,24 @@ body
 	padding: 20px;
 	border: 1px solid #888;
 	width: 80%;
+}
+
+.modal-task-label
+{
+	font-size: 25px;
+	font-weight: bold;
+	text-align: left;
+}
+
+.modal-task-attributes
+{
+	font-size: 20px;
+	margin: 5px 10px 30px 30px;
+}
+
+.modal-input-spacing
+{
+	margin: -20px 10px 30px 0px;
 }
 
 .close 
