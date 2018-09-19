@@ -5,19 +5,11 @@ body
 
 }
 
-
-/********************
-*****Layout Grid*****
-*********************/
-.lists
+.top-content
 {
-	display: grid;
-	height: 100%;
-	grid-template-columns: 0.5fr 1fr 1fr 0.5fr;
-	grid-template-rows: 0fr 1.5fr 0.5fr;
-	/* grid-gap: 1px 1px; */
-	grid-template-areas: ". . . ." ". . . ." ". . . .";
+	text-align: center;
 }
+
 
 
 /*********************
@@ -25,31 +17,35 @@ body
 *********************/
 .entries
 {
-	text-align: center;
+	
+    margin: 20px;
+    display:inline-block;
 }
+
 
 .entires-content
 {
-	display: inline-block; 
+	float: left;
+	text-align: left;
+}
+
+.entires-content input
+{
+	float: left;
 	text-align: left;
 }
 
 .to-do-creation-form
 {
 	text-align: center;
-	grid-column-start: 2;
-	grid-row-start: 1;	
 }
 
 .button {
 	background-color: #b2b2b2;
 	border: none;
 	padding: 20px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
 	font-size: 16px;
-	margin: 4px 2px;
+	margin: -6px 2px;
 	cursor: pointer;
 	border-radius: 12px
 }
@@ -88,6 +84,7 @@ body
 	font-weight: bold;
 	border-radius: 12px;
 	border-style: groove;
+	width: 60%;
 }
 
 .description-input
@@ -201,14 +198,20 @@ body
 /********************
 ****List Elements****
 ********************/
+
+.to-do-list-container
+{
+	display:inline-block;
+	width:100%;
+}
+
 .to-do-h1
 {
 	border: thick double black;
 	border-top-left-radius: 25px;
+	border-top-right-radius: 25px;
 	margin: inherit;
 	text-align: center;
-	grid-column-start: 2;
-	grid-row-start: 1;
 	background: #3399ff;
 }
 
@@ -217,8 +220,6 @@ body
 	border: thick double black;
 	margin: inherit;
 	text-align: center;
-	grid-column-start: 2;
-	grid-row-start: 2;
 	background: #3399ff;
 	list-style:none;
 }
@@ -229,18 +230,22 @@ body
 	text-align: left;
 	background: #cce5ff;
 	margin: 5px 5px 5px 25px;
+	cursor: pointer;
 }
 
 .done-h1
 {
 	border: thick double black;
-	border-top-right-radius: 25px;
 	margin-top: inherit;
 	margin-bottom: inherit;
 	text-align: center;
-	grid-column-start: 3;
-	grid-row-start: 1;
 	background: #3399ff;	
+}
+
+.done-list-container
+{
+	display:inline-block;
+	width:100%;
 }
 
 .done-list
@@ -248,8 +253,6 @@ body
 	border: thick double black;
 	margin: inherit;
 	text-align: center;
-	grid-column-start: 3;
-	grid-row-start: 2;
 	background: #3399ff;	
 }
 
@@ -260,6 +263,7 @@ body
 	background: #cce5ff;
 	margin: 5px 25px 5px -12px;
 	text-decoration: line-through;
+	cursor: pointer;
 }
 
 
@@ -327,4 +331,46 @@ body
 	color: #000;
 	text-decoration: none;
 	cursor: pointer;
+}
+
+
+/******************
+***Control Panel***
+******************/
+
+.control-panel
+{
+	float: left;
+	width: auto;
+	border: thick double black;
+	background: #b2b2b2;
+	text-align:center;
+	display: inline-block;
+}
+
+.control-panel button
+{
+	border: none;
+	padding: 10px;
+	text-align: center;
+	font-size: 25px;
+	margin: 4px 2px;
+	cursor: pointer;
+	border-radius: 12px
+}
+
+.dump-list
+{
+	background-color: #FF0000;
+
+}
+
+.delete-all
+{
+	background-color: #FF0000;
+}
+
+.display-done
+{
+	background-color: #3399ff;
 }

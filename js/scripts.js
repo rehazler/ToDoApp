@@ -115,8 +115,24 @@ function moveTaskToDoneList(taskID, targetElement)
 		completedTask.parentNode.removeChild(completedTask);
 		liCreator(completedTask.textContent, completedTask.id, "Done", completedTask.classList);
 		timer.splice(taskID,1);
+		doneListToggle();
 	}
 	
+}
+
+function doneListToggle()
+{
+	let doneListDiv = document.querySelector("#doneListDiv");
+
+	if(doneListDiv.classList.contains("hidden"))
+	{
+		doneListDiv.classList.remove("hidden");
+		setTimeout(doneListToggle , 10000);
+	}
+	else
+	{
+		doneListDiv.classList.add("hidden");
+	}
 }
 
 //Returns the number of tasks that exist in the localStorage
@@ -159,10 +175,10 @@ function liCreator(itemText, itemID, toDoStatus, classArray=[])
 {
 	let list;	
 	let newToDoItem = document.createElement("li");
-	let span = document.createElement("span");
+	let liTextContainer = document.createElement("span");
 
-	span.textContent = itemText;
-	newToDoItem.appendChild(span);
+	liTextContainer.textContent = itemText;
+	newToDoItem.appendChild(liTextContainer);
 
 	for(let i = 0; i < classArray.length; i++) {
 		newToDoItem.classList.add(classArray[i]);
@@ -363,24 +379,23 @@ function populateEditModal(taskID, taskElementArray)
 //Needs to be reworked to fill in modal information and inputs
 function populateModal(event)
 {
-	// Get the modal
-	let modal = document.querySelector("#myModal");
-	//Modal content
-	let modalText = document.querySelectorAll(".modal-text")[0];
-	// Get the <span> element that closes the modal
-	let spanClose = document.querySelectorAll(".close")[0];
-	let list = event.target.closest("UL");
-
-	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-	let taskID = event.target.id;
-	let targetTask = tasksArray[getTaskIndex(taskID)];
-
 	// If the user clicks an li
-	if(event.target && event.target.nodeName == "LI") {
+	if(event.target && !event.target.classList.contains("checkmark") && (event.target.nodeName == "LI" || event.target.nodeName == "SPAN")) 
+	{
+		// Get the modal
+		let modal = document.querySelector("#myModal");
+		//Modal content
+		let modalText = document.querySelectorAll(".modal-text")[0];
+		// Get the <span> element that closes the modal
+		let spanClose = document.querySelectorAll(".close")[0];
+		let list = event.target.closest("UL");
+		let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+
+		let taskID = event.target.id.includes("task") ? event.target.id : event.target.parentNode.id;
+		let targetTask = tasksArray[getTaskIndex(taskID)];
 		let deleteButton = createHTMLElement("button", "Delete", ["delete-button"]);
-		let editButton = createHTMLElement("button", "Edit", ["edit-button"]);
-		
 		let targetTaskArray = new Array();
+
 		for(let key in targetTask)
 		{
 			if(key !== "to_do_id")
@@ -394,7 +409,21 @@ function populateModal(event)
 		
 		modalToggle();
 
-		modalText.appendChild(editButton);
+		if(!event.target.classList.contains("done-list-item"))
+		{
+			let editButton = createHTMLElement("button", "Edit", ["edit-button"]);
+			modalText.appendChild(editButton);
+
+			editButton.addEventListener("click", function editTask()
+			{
+				modalText.removeChild(editButton);
+				modalText.removeChild(deleteButton);
+				populateEditModal(taskID, targetTaskArray);
+				editButton.removeEventListener("click", editTask);
+				
+			});
+		}
+
 		modalText.appendChild(deleteButton);
 
 		//Delete task button
@@ -411,14 +440,6 @@ function populateModal(event)
 			}
 		});
 
-		editButton.addEventListener("click", function editTask()
-		{
-			modalText.removeChild(editButton);
-			modalText.removeChild(deleteButton);
-			populateEditModal(taskID, targetTaskArray);
-			editButton.removeEventListener("click", editTask);
-			
-		});
 
 		// When the user clicks on <span> (x), close the modal
 		spanClose.addEventListener("click", function closeSpanModal()
