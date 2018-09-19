@@ -12,7 +12,7 @@
 ////////////////
 
 //toDoID, toDoTitle, toDoDescription, toDoPriority, dueDate, toDoStatus
-function Task(toDoID, toDoTitle, toDoDescription = "", toDoPriority = 1, toDoDueDate = new Date(), toDoStatus = "In Progress")
+function Task(toDoID, toDoTitle, toDoDescription = "", toDoPriority = 1, toDoDueDate = "No set date", toDoStatus = "In Progress")
 {
 	this.to_do_id = toDoID;
 	this.to_do_title = toDoTitle; 
@@ -37,23 +37,12 @@ function initializePage()
 	//If local storage has items in it get them and parse them as json else store empty array.
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
 	let totalTasksCount = localStorage.getItem("totalTasks") ? JSON.parse(localStorage.getItem("totalTasks")) : 0;
-	let inProgressTaskExists = false;
 
 	//Set localstorage to currently stored info
 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
 	localStorage.setItem("totalTasks", totalTasksCount);
 
-	//Parse each item from local storage
-	const data = JSON.parse(localStorage.getItem("tasks"));
-
-	// Loop through each stored item in the localstorage and recreate it on refresh/reload
-	data.forEach(task => {
-		liCreator(task["to_do_title"], task["to_do_id"], task["to_do_status"]);
-		if(task["to_do_status"] === "In Progress")
-		{
-			inProgressTaskExists = true;
-		}
-	});
+	let inProgressTaskExists = buildList();
 
 	////////////////
 	//DOM Elements//
@@ -124,9 +113,9 @@ function initializePage()
 
 	//Control Panel
 	displayDoneButton.addEventListener("click", doneListToggle.bind(event));
-	localStorage.setItem("testclear", JSON.stringify("test"));
 	dumpListButton.addEventListener("click", () => 
 	{
+		tasksArray = JSON.parse(localStorage.getItem("tasks"));
 		if(confirm("Are you sure? This will DELETE your to do list then print your to do list in the console."))
 		{
 			tasksArray = tasksArray.filter(function( task ) {
@@ -134,7 +123,6 @@ function initializePage()
 				{
 					//console.log left intetionally. This is meant to output existing to do tasks to the console
 					//for the user if they wish.
-					console.log(task);
 					toDoList.textContent = "";
 					toDoListDiv.classList.add("hidden");
 				}
@@ -162,6 +150,36 @@ function initializePage()
 	});
 }
 
+function buildList()
+{
+	//Parse each item from local storage
+	const data = JSON.parse(localStorage.getItem("tasks"));
+	let twentyFourHours = (60 * 60 * 24 * 1000);
+	let now = new Date();
+	let inProgressTaskExists = false;
+	//Sort the data by priority. 5 being highest priority and 1 being lowest
+	data.sort(function(priorityA, priorityB){
+		return priorityB.to_do_priority - priorityA.to_do_priority;
+	});
+
+	// Loop through each stored item in the localstorage and recreate it on refresh/reload
+	data.forEach(task => {
+		if(task["to_do_status"] === "In Progress")
+		{
+			inProgressTaskExists = true;
+			let dueDate = task["to_do_due_date"];
+			if(dueDate !== "No set date" && (new Date(dueDate) - now) < twentyFourHours)
+			{
+				liCreator(task["to_do_title"], task["to_do_id"], task["to_do_status"], ["approaching-due-date"]);
+				return;
+			} 
+		}
+		liCreator(task["to_do_title"], task["to_do_id"], task["to_do_status"]);
+	});
+
+	return inProgressTaskExists;
+}
+
 function moveTaskToDoneList(taskID, event)
 {
 	//Safe guard to double check that the item is checked in case the user were to spam click the checkbox or
@@ -169,12 +187,18 @@ function moveTaskToDoneList(taskID, event)
 	if(event.target.checked)
 	{
 		let completedTask = event.target.closest(".to-do-list-item");
-		modifyTasks(getTaskIndex(taskID), "Complete");
-		completedTask.classList.remove("to-do-list-item");
-		completedTask.parentNode.removeChild(completedTask);
-		liCreator(completedTask.textContent, completedTask.id, "Done", completedTask.classList);
-		timer.splice(taskID,1);
-		doneListToggle(event);
+		//Make sure that a parent node exists prior to moving the completed task
+		//The parent node would likely be missing if the user attempted to complete
+		//the task but deleted it before it was moved.
+		if(completedTask.parentNode !== null)
+		{
+			modifyTasks(getTaskIndex(taskID), "Complete");
+			completedTask.classList.remove("to-do-list-item");
+			completedTask.parentNode.removeChild(completedTask);
+			liCreator(completedTask.textContent, completedTask.id, "Done", completedTask.classList);
+			timer.splice(taskID,1);
+			doneListToggle(event);
+		}
 	}
 	
 }
@@ -321,26 +345,27 @@ function modifyTasks(taskIndex, modificationType, form = "")
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
 	let taskElement;
 
-	switch (modificationType)
+	if(typeof tasksArray[taskIndex] !== "undefined")
 	{
-	case "Complete":
-		tasksArray[taskIndex].to_do_status = "Complete";
-		break;
+		switch (modificationType)
+		{
+		case "Complete":
+			tasksArray[taskIndex].to_do_status = "Complete";
+			break;
 
-	case "Edit":
-		taskElement = document.querySelector(`#${tasksArray[taskIndex].to_do_id}`);
-		//Change the title in the list item's span
-		taskElement.childNodes[1].textContent = form.titleInput.value;
-		tasksArray[taskIndex].to_do_title = form.titleInput.value;
-		tasksArray[taskIndex].to_do_description = form.descriptionInput.value;
-		tasksArray[taskIndex].to_do_priority = form.priorityInput.value;
-		tasksArray[taskIndex].to_do_due_date = new Date(`${form.dueDateInput.value} ${form.dueTimeInput.value}`);
+		case "Edit":
+			taskElement = document.querySelector(`#${tasksArray[taskIndex].to_do_id}`);
+			//Change the title in the list item's span
+			taskElement.childNodes[1].textContent = form.titleInput.value;
+			tasksArray[taskIndex].to_do_title = form.titleInput.value;
+			tasksArray[taskIndex].to_do_description = form.descriptionInput.value;
+			tasksArray[taskIndex].to_do_priority = parseInt(form.priorityInput.value);
+			tasksArray[taskIndex].to_do_due_date = new Date(`${form.dueDateInput.value} ${form.dueTimeInput.value}`);
 
-		break;
+			break;
+		}
+		localStorage.setItem("tasks", JSON.stringify(tasksArray));
 	}
-	
-
-	localStorage.setItem("tasks", JSON.stringify(tasksArray));
 }
 
 function removeTaskFromMemory(tasksArray, taskID)
@@ -392,6 +417,7 @@ function populateEditModal(taskID, taskElementArray)
 {
 	let taskIndex = getTaskIndex(taskID);
 	let taskToEdit = JSON.parse(localStorage.getItem("tasks"))[taskIndex];
+	let dueDate = new Date(taskToEdit.to_do_due_date);
 
 	let modal = document.querySelector(".modal-text");
 	let editForm = createHTMLElement("form", "edit");
@@ -424,10 +450,12 @@ function populateEditModal(taskID, taskElementArray)
 
 	dueDateInput.setAttribute("type", "date");
 	dueDateInput.setAttribute("id", "dueDateInput");
+	dueDateInput.setAttribute("value", formatDate(dueDate, "Date"));
 	modal.insertBefore(dueDateInput, taskElementArray[3].nextSibling);
 
 	dueTimeInput.setAttribute("type", "time");
 	dueTimeInput.setAttribute("id", "dueTimeInput");
+	dueTimeInput.setAttribute("value", formatDate(dueDate, "Time"));
 	modal.insertBefore(dueTimeInput, dueDateInput.nextSibling);
 	modal.insertBefore(document.createElement("br"), dueTimeInput.nextSibling);
 
@@ -452,18 +480,59 @@ function populateEditModal(taskID, taskElementArray)
 	});
 }
 
-function formatDate(date) {
-	let hours = date.getHours();
-	let minutes = date.getMinutes();
-	let ampm = hours >= 12 ? "pm" : "am";
+function formatDate(date, dateOrTime ="") {
+	if(date instanceof Date && !isNaN(date))
+	{
+		let hours = date.getHours();
+		let minutes = date.getMinutes();
+		let ampm = hours >= 12 ? "pm" : "am";
+		let month = date.getMonth() + 1
+		let day = date.getDate();
+		let year = date.getFullYear();
 
-	hours = hours % 12;
-	hours = hours ? hours : 12; 
-	minutes = minutes < 10 ? `0${minutes}` : minutes;
+		month = month < 10 ? `0${month}` : month;
+		minutes = minutes < 10 ? `0${minutes}` : minutes;
 
-	return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} at ${hours}:${minutes} ${ampm}`;
+		if(dateOrTime === "Time")
+		{
+			hours = hours < 10 ? `0${hours}` : hours;
+			return `${hours}:${minutes}`;
+
+		}
+		else if(dateOrTime === "Date")
+		{
+			return `${year}-${month}-${day}`;
+		}
+		else
+		{
+			hours = hours % 12;
+			hours = hours ? hours : 12; 
+			return `${month}/${day}/${year} at ${hours}:${minutes} ${ampm}`;
+		}
+	}
+
+	return "No set date";
 }
 
+
+function closeModalEvent(event)
+{ 
+	let modal = document.querySelector("#myModal");
+	let spanClose = document.querySelectorAll(".close")[0];
+
+	if (event.target === modal) {
+		modalToggle();
+		window.removeEventListener("click", closeModalEvent, event);
+		spanClose.removeEventListener("click", closeModalEvent, event);
+	}
+	else if (event.target === spanClose)
+	{
+		modalToggle();
+		spanClose.removeEventListener("click", closeModalEvent, event);
+		window.removeEventListener("click", closeModalEvent, event);
+	}
+	
+}
 
 
 //Needs to be reworked to fill in modal information and inputs
@@ -472,8 +541,6 @@ function populateModal(event)
 	// If the user clicks an li
 	if(event.target && !event.target.classList.contains("checkmark") && (event.target.nodeName == "LI" || event.target.nodeName == "SPAN")) 
 	{
-		// Get the modal
-		let modal = document.querySelector("#myModal");
 		//Modal content
 		let modalText = document.querySelectorAll(".modal-text")[0];
 		// Get the <span> element that closes the modal
@@ -535,19 +602,10 @@ function populateModal(event)
 
 
 		// When the user clicks on <span> (x), close the modal
-		spanClose.addEventListener("click", function closeSpanModal()
-		{ 
-			modalToggle();
-			spanClose.removeEventListener("click", closeSpanModal);
-		});
+		spanClose.addEventListener("click",closeModalEvent, event);
 		// When the user clicks anywhere outside of the modal, close it
-		window.addEventListener("click", function closeWindowModal(event) 
-		{
-			if (event.target == modal) {
-				modalToggle();
-				window.removeEventListener("click", closeWindowModal);
-			}
-		});
+		window.addEventListener("click", closeModalEvent, event);
+		
 	}
 }
 

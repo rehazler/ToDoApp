@@ -237,6 +237,11 @@ body
 	padding: 10px;
 }
 
+.approaching-due-date
+{
+	background: #ff9999;
+}
+
 .done-h1
 {
 	border: thick double black;
