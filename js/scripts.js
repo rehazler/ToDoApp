@@ -125,7 +125,7 @@ function initializePage()
 	//Control Panel
 	displayDoneButton.addEventListener("click", doneListToggle.bind(event));
 	localStorage.setItem("testclear", JSON.stringify("test"));
-	dumpListButton.addEventListener("click", event => 
+	dumpListButton.addEventListener("click", () => 
 	{
 		if(confirm("Are you sure? This will DELETE your to do list then print your to do list in the console."))
 		{
@@ -143,11 +143,11 @@ function initializePage()
 					return task;
 				}
 			});
-			// localStorage.setItem("tasks", JSON.stringify(tasksArray));
+			localStorage.setItem("tasks", JSON.stringify(tasksArray));
 		}
 	});
 
-	deleteMemoryButton.addEventListener("click", event =>
+	deleteMemoryButton.addEventListener("click", () =>
 	{
 		if(confirm("Are you sure? This will restore everything to default and DELETE ALL lists and information!"))
 		{
@@ -408,6 +408,7 @@ function populateEditModal(taskID, taskElementArray)
 	modal.insertBefore(titleInput, taskElementArray[0].nextSibling);
 	modal.insertBefore(document.createElement("br"), titleInput.nextSibling);
 
+	descriptionInput.textContent = taskToEdit.to_do_description;
 	descriptionInput.setAttribute("value", taskToEdit.to_do_description);
 	descriptionInput.setAttribute("id", "descriptionInput");
 	modal.insertBefore(descriptionInput, taskElementArray[1].nextSibling);
@@ -451,6 +452,18 @@ function populateEditModal(taskID, taskElementArray)
 	});
 }
 
+function formatDate(date) {
+	let hours = date.getHours();
+	let minutes = date.getMinutes();
+	let ampm = hours >= 12 ? "pm" : "am";
+
+	hours = hours % 12;
+	hours = hours ? hours : 12; 
+	minutes = minutes < 10 ? `0${minutes}` : minutes;
+
+	return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} at ${hours}:${minutes} ${ampm}`;
+}
+
 
 
 //Needs to be reworked to fill in modal information and inputs
@@ -472,12 +485,15 @@ function populateModal(event)
 		let targetTask = tasksArray[getTaskIndex(taskID)];
 		let deleteButton = createHTMLElement("button", "Delete", ["delete-button"]);
 		let targetTaskArray = new Array();
+		let elementText = "";
 
 		for(let key in targetTask)
 		{
+			//We check this to prevent printing out the to do's id as it is not necessary
 			if(key !== "to_do_id")
 			{
-				let newElement = createHTMLElement("p", targetTask[key], ["modal-task-attributes"]);
+				elementText = key !== "to_do_due_date" ? targetTask[key] : formatDate(new Date(targetTask[key]));
+				let newElement = createHTMLElement("p", elementText, ["modal-task-attributes"]);
 				modalText.appendChild(newElement);
 				targetTaskArray.push(newElement);
 				modalText.insertBefore(labelCreator(key, ["modal-task-label"]), newElement);
