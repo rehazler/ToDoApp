@@ -123,6 +123,7 @@ function initializePage()
 				{
 					//console.log left intetionally. This is meant to output existing to do tasks to the console
 					//for the user if they wish.
+					console.log(task);
 					toDoList.textContent = "";
 					toDoListDiv.classList.add("hidden");
 				}
@@ -140,8 +141,10 @@ function initializePage()
 		if(confirm("Are you sure? This will restore everything to default and DELETE ALL lists and information!"))
 		{
 			localStorage.clear();
-			localStorage.setItem("tasks", JSON.stringify([]));
-			localStorage.setItem("totalTasks", 0);
+			tasksArray = new Array();
+			totalTasksCount = 0;
+			localStorage.setItem("tasks", JSON.stringify(tasksArray));
+			localStorage.setItem("totalTasks", totalTasksCount);
 			toDoList.textContent = "";
 			doneList.textContent = "";
 			toDoListDiv.classList.add("hidden");
@@ -152,11 +155,21 @@ function initializePage()
 
 function buildList()
 {
+	
 	//Parse each item from local storage
 	const data = JSON.parse(localStorage.getItem("tasks"));
+	let toDoList = document.querySelector("#toDoUL");
+	let doneList = document.querySelector("#doneUL");
 	let twentyFourHours = (60 * 60 * 24 * 1000);
 	let now = new Date();
 	let inProgressTaskExists = false;
+
+	if(toDoList.hasChildNodes() || doneList.hasChildNodes())
+	{
+		toDoList.textContent = "";
+		doneList.textContent = "";
+	}
+
 	//Sort the data by priority. 5 being highest priority and 1 being lowest
 	data.sort(function(priorityA, priorityB){
 		return priorityB.to_do_priority - priorityA.to_do_priority;
@@ -172,7 +185,7 @@ function buildList()
 			{
 				liCreator(task["to_do_title"], task["to_do_id"], task["to_do_status"], ["approaching-due-date"]);
 				return;
-			} 
+			}
 		}
 		liCreator(task["to_do_title"], task["to_do_id"], task["to_do_status"]);
 	});
@@ -343,7 +356,6 @@ function storeTasks(taskObject)
 function modifyTasks(taskIndex, modificationType, form = "") 
 {
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-	let taskElement;
 
 	if(typeof tasksArray[taskIndex] !== "undefined")
 	{
@@ -354,13 +366,14 @@ function modifyTasks(taskIndex, modificationType, form = "")
 			break;
 
 		case "Edit":
-			taskElement = document.querySelector(`#${tasksArray[taskIndex].to_do_id}`);
 			//Change the title in the list item's span
-			taskElement.childNodes[1].textContent = form.titleInput.value;
 			tasksArray[taskIndex].to_do_title = form.titleInput.value;
 			tasksArray[taskIndex].to_do_description = form.descriptionInput.value;
 			tasksArray[taskIndex].to_do_priority = parseInt(form.priorityInput.value);
-			tasksArray[taskIndex].to_do_due_date = new Date(`${form.dueDateInput.value} ${form.dueTimeInput.value}`);
+			if(form.dueDateInput.value !== "")
+			{
+				tasksArray[taskIndex].to_do_due_date = new Date(`${form.dueDateInput.value} ${form.dueTimeInput.value}`);
+			} 
 
 			break;
 		}
@@ -474,6 +487,7 @@ function populateEditModal(taskID, taskElementArray)
 		if(confirm("Do you want to submit these task changes?"))
 		{
 			modifyTasks(taskIndex, "Edit", event.target);
+			buildList();
 			modalToggle();
 			editForm.addEventListener("submit",editTask);
 		}
