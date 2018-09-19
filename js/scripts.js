@@ -37,6 +37,7 @@ function initializePage()
 	//If local storage has items in it get them and parse them as json else store empty array.
 	let tasksArray = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
 	let totalTasksCount = localStorage.getItem("totalTasks") ? JSON.parse(localStorage.getItem("totalTasks")) : 0;
+	let inProgressTaskExists = false;
 
 	//Set localstorage to currently stored info
 	localStorage.setItem("tasks", JSON.stringify(tasksArray));
@@ -48,6 +49,10 @@ function initializePage()
 	// Loop through each stored item in the localstorage and recreate it on refresh/reload
 	data.forEach(task => {
 		liCreator(task["to_do_title"], task["to_do_id"], task["to_do_status"]);
+		if(task["to_do_status"] === "In Progress")
+		{
+			inProgressTaskExists = true;
+		}
 	});
 
 	////////////////
@@ -55,8 +60,18 @@ function initializePage()
 	////////////////
 
 	let toDoList = document.querySelector("#toDoUL");
+	let toDoListDiv = document.querySelector("#toDoListDiv");
 	let doneList = document.querySelector("#doneUL");
+	let doneListDiv = document.querySelector("#doneListDiv");
 	let toDoForm = document.forms.toDoCreationForm;
+	let displayDoneButton = document.querySelector(".display-done");
+	let dumpListButton = document.querySelector(".dump-list");
+	let deleteMemoryButton = document.querySelector(".delete-all");
+
+	if(inProgressTaskExists && toDoListDiv.classList.contains("hidden"))
+	{
+		toDoListDiv.classList.remove("hidden");
+	}
 
 
 	///////////////////
@@ -69,7 +84,7 @@ function initializePage()
 		let checkedListItemID = checkedListItem.id;
 
 		if(event.target.checked){
-			timer.push({checkedListItemID:setTimeout(moveTaskToDoneList, 2000, checkedListItemID, event.target)});
+			timer.push({checkedListItemID:setTimeout(moveTaskToDoneList, 2000, checkedListItemID, event)});
 		}
 		else
 		{
@@ -85,6 +100,11 @@ function initializePage()
 
 		if(event.target.toDoInput.value.trim())
 		{
+			if(toDoListDiv.classList.contains("hidden"))
+			{
+				toDoListDiv.classList.remove("hidden");
+			}
+
 			localStorage.setItem("totalTasks",  ++totalTasksCount );
 			const task = new Task(`task${totalTasksCount}`, event.target.toDoInput.value);
 			storeTasks(task);
@@ -101,37 +121,94 @@ function initializePage()
 	// When user clicks a list item, pop up a modal for that list item
 	toDoList.addEventListener("click", populateModal.bind(event));
 	doneList.addEventListener("click", populateModal.bind(event)); 
+
+	//Control Panel
+	displayDoneButton.addEventListener("click", doneListToggle.bind(event));
+	localStorage.setItem("testclear", JSON.stringify("test"));
+	dumpListButton.addEventListener("click", event => 
+	{
+		if(confirm("Are you sure? This will DELETE your to do list then print your to do list in the console."))
+		{
+			tasksArray = tasksArray.filter(function( task ) {
+				if(task.to_do_status === "In Progress")
+				{
+					//console.log left intetionally. This is meant to output existing to do tasks to the console
+					//for the user if they wish.
+					console.log(task);
+					toDoList.textContent = "";
+					toDoListDiv.classList.add("hidden");
+				}
+				else
+				{
+					return task;
+				}
+			});
+			// localStorage.setItem("tasks", JSON.stringify(tasksArray));
+		}
+	});
+
+	deleteMemoryButton.addEventListener("click", event =>
+	{
+		if(confirm("Are you sure? This will restore everything to default and DELETE ALL lists and information!"))
+		{
+			localStorage.clear();
+			localStorage.setItem("tasks", JSON.stringify([]));
+			localStorage.setItem("totalTasks", 0);
+			toDoList.textContent = "";
+			doneList.textContent = "";
+			toDoListDiv.classList.add("hidden");
+			doneListDiv.classList.add("hidden");
+		}
+	});
 }
 
-function moveTaskToDoneList(taskID, targetElement)
+function moveTaskToDoneList(taskID, event)
 {
 	//Safe guard to double check that the item is checked in case the user were to spam click the checkbox or
 	//accidentally uncheck the box right before the transfer from to do to completed.
-	if(targetElement.checked)
+	if(event.target.checked)
 	{
-		let completedTask = targetElement.closest(".to-do-list-item");
+		let completedTask = event.target.closest(".to-do-list-item");
 		modifyTasks(getTaskIndex(taskID), "Complete");
 		completedTask.classList.remove("to-do-list-item");
 		completedTask.parentNode.removeChild(completedTask);
 		liCreator(completedTask.textContent, completedTask.id, "Done", completedTask.classList);
 		timer.splice(taskID,1);
-		doneListToggle();
+		doneListToggle(event);
 	}
 	
 }
 
-function doneListToggle()
+function doneListToggle(event)
 {
 	let doneListDiv = document.querySelector("#doneListDiv");
+	let doneList = document.querySelector(".done-list");
 
 	if(doneListDiv.classList.contains("hidden"))
 	{
-		doneListDiv.classList.remove("hidden");
-		setTimeout(doneListToggle , 10000);
+		if(doneList.hasChildNodes())
+		{
+			doneListDiv.classList.remove("hidden");
+			if(event.target.nodeName !== "BUTTON")
+			{
+				setTimeout(doneListToggle, 10000, "no event");
+			}
+		}
+		else
+		{
+			alert("You have no completed tasks.");
+		}
 	}
 	else
 	{
-		doneListDiv.classList.add("hidden");
+		//If "no event" is sent, this means that this function was called by the timeout and not by user action.
+		//If the button is pressed, this means the user has chosen to toggle the done list.
+		//By doing it this way, it prevents the done list from being closed by sending an item to the done list while
+		//it is toggled on by the button.
+		if(event === "no event" || event.target.nodeName === "BUTTON")
+		{
+			doneListDiv.classList.add("hidden");
+		}
 	}
 }
 

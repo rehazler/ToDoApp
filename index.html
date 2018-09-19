@@ -11,10 +11,10 @@
 <body>
 	<div class="top-content">
 		<div class="control-panel">
-			<p><b>Control Panel</b></p>
+			<label class="control-panel-text">Control Panel</label>
 			<button class="display-done fas fa-align-justify" title="Display completed Tasks"></button>
 			<button class="dump-list fas fa-print" title="Empty list and log in console"></button>
-			<button class="delete-all fas fa-burn" title="Delete all save data"></button>
+			<button class="delete-all fas fa-trash-alt" title="Delete all save data"></button>
 		</div>
 		<!-- To Do Item input form -->
 		<div class="entries">
@@ -29,7 +29,7 @@
 		</div>
 	</div>
 	<!-- To Do/Done Lists  -->
-	<div id="toDoListDiv" class="to-do-list-container">
+	<div id="toDoListDiv" class="to-do-list-container hidden">
 		<h1 id="toDoHeader" class="to-do-h1">To Do</h1>
 		<ul id="toDoUL" class="to-do-list"></ul>
 	</div>

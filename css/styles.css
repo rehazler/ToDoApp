@@ -17,16 +17,18 @@ body
 *********************/
 .entries
 {
-	
-    margin: 20px;
     display:inline-block;
 }
-
 
 .entires-content
 {
 	float: left;
 	text-align: left;
+	border: thick double black;
+	background: #b2b2b2;
+	padding: 10px 10px 10px 10px;
+	margin: 0px 20px 20px 0px;
+	display: inline-block;
 }
 
 .entires-content input
@@ -41,8 +43,8 @@ body
 }
 
 .button {
-	background-color: #b2b2b2;
-	border: none;
+	background-color: #3399ff;
+	border-style: groove;
 	padding: 20px;
 	font-size: 16px;
 	margin: -6px 2px;
@@ -53,7 +55,7 @@ body
 .delete-button
 {
 	background-color: #FF0000;
-	border: none;
+	border-style: groove;
 	padding: 10px;
 	text-align: center;
 	text-decoration: none;
@@ -67,7 +69,7 @@ body
 .edit-button
 {
 	background-color: #32CD32;
-	border: none;
+	border-style: groove;
 	padding: 10px 19.34375px 10px 19.34374px;
 	text-align: center;
 	text-decoration: none;
@@ -80,6 +82,7 @@ body
 
 .input[type=text] {
 	padding: 12px 20px;
+	margin: 0px 0px 10px 0px;
 	font-size: 18px;
 	font-weight: bold;
 	border-radius: 12px;
@@ -138,9 +141,6 @@ body
 	margin: 0px 0px 0px -33px;
 	cursor: pointer;
 	font-size: 22px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 }
 
@@ -152,11 +152,13 @@ body
 
 .checkmark {
 	position: absolute;
-	top: 2px;
-	left: 0;
 	height: 20px;
 	width: 20px;
 	background-color: #eee;
+	border-radius: 12px;
+	border-style: groove;
+	padding: 10px;
+	margin: -10px 0px 0px -25px;
 }
 
 .checkbox-container:hover input ~ .checkmark 
@@ -182,12 +184,12 @@ body
 
 .checkbox-container .checkmark:after 
 {
-	left: 5px;
+	left: 13px;
 	top: 1px;
-	width: 5px;
-	height: 10px;
+	width: 10px;
+	height: 26px;
 	border: solid white;
-	border-width: 0 3px 3px 0;
+	border-width: 0 5px 5px 0;
 	-webkit-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
 	transform: rotate(45deg);
@@ -231,6 +233,8 @@ body
 	background: #cce5ff;
 	margin: 5px 5px 5px 25px;
 	cursor: pointer;
+	border-radius: 12px;
+	padding: 10px;
 }
 
 .done-h1
@@ -264,6 +268,8 @@ body
 	margin: 5px 25px 5px -12px;
 	text-decoration: line-through;
 	cursor: pointer;
+	border-radius: 12px;
+	padding: 10px;
 }
 
 
@@ -283,6 +289,7 @@ body
 	overflow: auto;
 	background-color: rgb(0,0,0);
 	background-color: rgba(0,0,0,0.4);
+	border-style: groove;
 }
 
 .hidden
@@ -346,6 +353,8 @@ body
 	background: #b2b2b2;
 	text-align:center;
 	display: inline-block;
+	margin: 0px 0px 10px 0px;
+	padding: 1px 0px 5px 0px;
 }
 
 .control-panel button
@@ -356,7 +365,16 @@ body
 	font-size: 25px;
 	margin: 4px 2px;
 	cursor: pointer;
-	border-radius: 12px
+	border-radius: 12px;
+	border-style: groove;
+}
+
+.control-panel-text
+{
+	margin:10px 0px 1px 0px;
+	font-size: 20px;
+	font-weight: bold;
+	display: block;
 }
 
 .dump-list
